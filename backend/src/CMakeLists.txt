@@ -1,6 +1,7 @@
 
 add_subdirectory(utils)
 add_subdirectory(dao)
+add_subdirectory(services)
 
 add_executable(clouddisk main.cc)
 

@@ -1,6 +1,6 @@
 #include <string>
 #include <cstdint>
-
+#include <iostream>
 namespace models
 {
 
@@ -14,6 +14,18 @@ namespace models
         int status;
         int role;
         int id;
+
+        friend std::ostream& operator<<(std::ostream& os, const SysUser& user) {
+            os << "[SysUser]: " << user.user_name 
+                << ", " << user.password_hash << ", " 
+                << user.create_time << ", " 
+                << "use_capacity: " << user.use_capacity << ", " 
+                << "total_capacity: " << user.total_capacity << ", " 
+                << "status: " << user.status << ", " 
+                << "role: " << user.role << ", " 
+                << "id: " << user.id;
+            return os;
+        }
     };
 
 }
