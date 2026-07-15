@@ -33,7 +33,7 @@ endif()
 find_package(fmt REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(jwt-cpp REQUIRED)
-
+find_package(spdlog REQUIRED)
 
 add_library(clouddisk_common INTERFACE)
 
@@ -48,6 +48,7 @@ target_link_libraries(clouddisk_common INTERFACE
     jwt-cpp::jwt-cpp
     nlohmann_json
     sodium
+    spdlog
 )
 
 add_subdirectory(src)
