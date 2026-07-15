@@ -17,7 +17,7 @@ private:
     static std::shared_ptr<spdlog::logger> instance_; // 静态日志实例（单例）
 };
 
-} // namespace netdisk::utils
+} // namespace utils
 
 // 便捷宏定义：不同级别的日志输出
 #define LOG_DEBUG(...) utils::Logger::get()->debug(__VA_ARGS__) // 调试日志

@@ -2,6 +2,7 @@ set(UTILS_SRC
 	JWT.cc
 	Hash.cc
 	Logger.cc
+	Config.cc
 )
 
 add_library(clouddisk_utils STATIC ${UTILS_SRC})
