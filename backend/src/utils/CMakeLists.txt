@@ -3,6 +3,7 @@ set(UTILS_SRC
 	Hash.cc
 	Logger.cc
 	Config.cc
+	PreSql.cc
 )
 
 add_library(clouddisk_utils STATIC ${UTILS_SRC})
