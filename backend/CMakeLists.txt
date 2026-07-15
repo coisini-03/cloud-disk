@@ -34,6 +34,7 @@ find_package(fmt REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(jwt-cpp REQUIRED)
 
+
 add_library(clouddisk_common INTERFACE)
 
 link_directories(/usr/local/lib)
@@ -46,6 +47,7 @@ target_link_libraries(clouddisk_common INTERFACE
     fmt
     jwt-cpp::jwt-cpp
     nlohmann_json
+    sodium
 )
 
 add_subdirectory(src)

@@ -1,5 +1,6 @@
 set(UTILS_SRC
 	JWT.cc
+	Hash.cc
 )
 
 add_library(clouddisk_utils STATIC ${UTILS_SRC})
