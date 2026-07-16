@@ -1,6 +1,7 @@
 
 set(DAO_SRC
     UserDao.cc
+    TlbFileDao.cc
 )
 
 add_library(clouddisk_dao ${DAO_SRC})

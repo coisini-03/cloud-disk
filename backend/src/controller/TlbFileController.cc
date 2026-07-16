@@ -1,0 +1,89 @@
+
+#include <controller/TlbFileController.hpp>
+#include <nlohmann/json.hpp>
+#include <utils/JWT.hpp>
+
+namespace controller
+{
+    using json = nlohmann::json;
+    using namespace std::placeholders;
+    // 构造
+    TlbFileController::TlbFileController(services::TlbFileService &tlbFileService)
+    : tlbFileService_(tlbFileService)
+    {
+    }
+    // 注册路由
+    void TlbFileController::registerRoutes(wfrest::BluePrint &bp)
+    {
+        bp.POST("/upload",std::bind(&TlbFileController::uploadHandler,this,_1,_2,_3));
+    }
+    // 析构
+    TlbFileController::~TlbFileController()=default;
+    // 上传文件
+    void TlbFileController::uploadHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw)
+    {
+        // 解析获取token
+        std::string content_type = req->header("Content-Type");
+        std::cout << content_type << std::endl;
+        std::string auth_header = req->header("Authorization");
+        std::string token = "";
+        json resp_json;
+        if (auth_header.length() > 7 && auth_header.substr(0, 7) == "Bearer ") {
+            token = auth_header.substr(7); // 截掉前面的 "Bearer "，剩下的就是纯 Token
+        }
+        if (token.empty()) {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "未授权，请提供有效的 Token";
+            resp->Json(resp_json.dump());
+            return;
+        }
+        utils::JWT jwt = utils::JWT("secret");
+        int uid = 0;
+        int role = 0;
+
+        if(jwt.verifyJWT(token,uid,role)){  
+            
+            std::string base_url = "/home/coisini/wangdao/code/cloud-disk/backend/upload/";
+            const wfrest::Form &form = req->form();
+            json resp_json;
+            for (auto &it: form)
+            {
+                auto &name = it.first;
+                auto &file_info = it.second;
+                std::cout << name << std::endl;
+                std::cout << file_info.second << std::endl;
+                std::string filename = file_info.first;
+                std::string physical_path = base_url + filename;
+                std::cout << physical_path << std::endl;
+                SubTask *task = tlbFileService_.upload(uid,physical_path,file_info.second,0,[resp,sw,filename,resp_json](bool ok,std::string msg)mutable {
+                    if(ok){
+                        // 获取上下文
+                        models::TlbFileContext *file_ctx = static_cast<models::TlbFileContext *>(sw->get_context());
+                        resp_json["status"] = "success";
+                        resp_json["message"] = "上传成功";
+                        resp_json["data"]["fileId"] = file_ctx->id;
+                        resp_json["data"]["filename"] = filename;
+                        resp->Json(resp_json.dump());
+                    }else{
+                        resp->set_status_code("401");
+                        resp_json["status"] = "error";
+                        resp_json["message"] = msg;
+                        resp->Json(resp_json.dump());
+                    }
+                });
+                sw->push_back(task);
+            }
+
+        }else
+        {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "无效的 Token";
+            resp->Json(resp_json.dump());
+            return;
+        }
+    }
+    
+
+}

@@ -1,5 +1,6 @@
 set(CONTROLLER_SRC
 	UserController.cc
+	TlbFileController.cc
 )
 add_library(clouddisk_controller STATIC ${CONTROLLER_SRC})
 

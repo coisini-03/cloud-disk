@@ -102,7 +102,7 @@ namespace dao
     WFMySQLTask* UserDao::select_by_id(const int user_id,std::function<void(bool ok, std::string msg,models::SysUser user)> on_complete){
         std::string sql = fmt::format(
             "SELECT * FROM sys_user WHERE id = {}",
-            user_id
+            std::to_string(user_id)
             );
 
         WFMySQLTask *task = WFTaskFactory::create_mysql_task(url_path_, 3,[on_complete](WFMySQLTask *task)

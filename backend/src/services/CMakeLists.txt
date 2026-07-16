@@ -1,6 +1,7 @@
 
 set(SERVICE_SRC
     UserService.cc
+    TlbFileService.cc
 )
 
 add_library(clouddisk_services STATIC ${SERVICE_SRC})
