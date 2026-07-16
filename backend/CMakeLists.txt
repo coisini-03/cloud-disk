@@ -34,7 +34,7 @@ find_package(fmt REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(jwt-cpp REQUIRED)
 find_package(spdlog REQUIRED)
-
+find_package(wfrest REQUIRED)
 add_library(clouddisk_common INTERFACE)
 
 link_directories(/usr/local/lib)
@@ -49,8 +49,11 @@ target_link_libraries(clouddisk_common INTERFACE
     nlohmann_json
     sodium
     spdlog
+    wfrest
 )
 
 add_subdirectory(src)
-
 add_subdirectory(tests)
+
+file(COPY ${CMAKE_SOURCE_DIR}/conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
+file(COPY ${CMAKE_SOURCE_DIR}/../frontend DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

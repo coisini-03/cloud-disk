@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <cstdint>
 #include <iostream>
@@ -27,5 +28,11 @@ namespace models
             return os;
         }
     };
-
+    struct UserContext
+    {
+        std::string user_name;
+        int user_id;
+        std::string token;
+        std::string token_type;
+    };
 }

@@ -40,7 +40,11 @@ namespace dao
                 on_complete(false,fmt::format("db error: {} {}",error_code,error_msg));
                 return ;
             }
-
+            
+            // 获取上下文
+            models::UserContext *user = static_cast<models::UserContext*>(series_of(task)->get_context());
+            protocol::MySQLResultCursor cursor(task->get_resp());
+            user->user_id = cursor.get_insert_id();
             on_complete(true,"");
             
         });
@@ -83,6 +87,9 @@ namespace dao
                 user.use_capacity = row_map["use_capacity"].as_ulonglong();
                 user.total_capacity = row_map["total_capacity"].as_ulonglong();
                 user.status = row_map["status"].as_int();
+                models::UserContext *user_ctx = static_cast<models::UserContext*>(series_of(task)->get_context());
+                user_ctx->user_id = user.id;
+                user_ctx->user_name = user.user_name;
                 on_complete(true,"",user);
             }else{
                 on_complete(false,"用户不存在",user);   

@@ -13,7 +13,7 @@ namespace utils
     }
     JWT::~JWT() = default;
 
-    std::string JWT::generateJWT(int &user_id, int role, int &expiretime_s)
+    std::string JWT::generateJWT(int &user_id, int role, int expiretime_s)
     {
         auto now = std::chrono::system_clock::now();
         std::string token = jwt::create<json_traits>()
