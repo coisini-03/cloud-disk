@@ -19,6 +19,8 @@ namespace controller {
         void registerHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw);
         // 登录用户
         void loginHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw);
+        // 获取当前用户信息
+        void getUserHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw);
     };
 
     

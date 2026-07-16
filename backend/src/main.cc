@@ -32,7 +32,7 @@ int main(int argc,char *arg[]){
     server.Static("/static","../frontend/www/static");
     // 注册路由
     userController.registerRoutes(bp);
-    server.register_blueprint(bp,"/api/v1/auth");
+    server.register_blueprint(bp,"/api/v1");
     // 启动服务器
     if(server.start(8080) == 0){
         std::cout << "Server started on port 8080" << std::endl;

@@ -45,4 +45,13 @@ namespace services
         });
         return task;
     }
+
+    WFMySQLTask *UserService::get_user_info(const int &id, std::function<void(bool ok,std::string msg,models::SysUser userInfo)> on_complete)
+    {
+        WFMySQLTask *task = userDao_.select_by_id(id,[on_complete](bool ok,std::string msg,models::SysUser user) mutable
+        {
+            on_complete(ok, msg, user);
+        });
+        return task;
+    }
 }

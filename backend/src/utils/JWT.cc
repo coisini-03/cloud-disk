@@ -27,7 +27,7 @@ namespace utils
         return token;
     }
 
-    bool JWT::verifyJWT(const std::string &token, std::string &user_id, int &role)
+    bool JWT::verifyJWT(const std::string &token, int &user_id, int &role)
     {
         try
         {
@@ -36,14 +36,15 @@ namespace utils
                                .allow_algorithm(jwt::algorithm::hs256{secret_key_})
                                .with_issuer("cloud-disk");
             verifer.verify(decoder);
-            user_id = decoder.get_payload_claim("user_id").as_integer();
-            role = decoder.get_payload_claim("role").as_integer();
+            user_id = std::stoi(decoder.get_payload_claim("user_id").as_string());
+            role = std::stoi(decoder.get_payload_claim("role").as_string());
             return true;
         }
         catch (const std::exception &e)
         {
+            // 验证失败
+            std::cerr << "JWT 验证失败: " << e.what() << std::endl;
             return false;
-        }
-        
+        } 
     }
 }

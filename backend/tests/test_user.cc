@@ -39,10 +39,24 @@ void test_select_by_username()
 
 }
 
+void test_select_by_id(){
+    WFMySQLTask *task = userDao.select_by_id(1, [](bool ok, std::string msg, models::SysUser user)
+                                       {
+        if(ok){
+            cout << "select_by_id success" << endl;
+            cout << user << endl;
+        }else{
+            cout << "select_by_id failed: " << msg << endl;
+        } });
+    task->start();
+    getchar();
+}
+
 int main(int argc, char *arg[])
 {
 
     // test_insert();
-    test_select_by_username();
+    // test_select_by_username();
+    test_select_by_id();
     return 0;
 }

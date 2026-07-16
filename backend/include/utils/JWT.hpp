@@ -10,7 +10,7 @@ namespace utils
         JWT(std::string secret_key);
         ~JWT();
         std::string generateJWT(int &user_id,int role,int expiretime_s);
-        bool verifyJWT(const std::string &token,std::string &user_id,int &role);
+        bool verifyJWT(const std::string &token,int &user_id,int &role);
     };
 
 }

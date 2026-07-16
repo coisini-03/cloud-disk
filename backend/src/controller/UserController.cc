@@ -4,6 +4,7 @@
 #include <workflow/Workflow.h>
 #include <services/UserService.hpp>
 #include <nlohmann/json.hpp>
+#include <utils/JWT.hpp>
 
 using json = nlohmann::json;
 using namespace std::placeholders;
@@ -16,8 +17,9 @@ namespace controller
     UserController::~UserController() = default;
     void UserController::registerRoutes(wfrest::BluePrint &bp)
     {
-        bp.POST("/register", std::bind(&UserController::registerHandler,this,_1,_2,_3));
-        bp.POST("/login", std::bind(&UserController::loginHandler,this,_1,_2,_3));
+        bp.POST("/auth/register", std::bind(&UserController::registerHandler,this,_1,_2,_3));
+        bp.POST("/auth/login", std::bind(&UserController::loginHandler,this,_1,_2,_3));
+        bp.GET("/user/me", std::bind(&UserController::getUserHandler,this,_1,_2,_3));
     }
 
     // 注册用户
@@ -97,6 +99,7 @@ namespace controller
                     resp->Json(resp_json.dump());
                 }
                 else{
+                    resp->set_status_code("401");
                     resp_json["status"] = "error";
                     resp_json["message"] = msg;
                     resp->Json(resp_json.dump());
@@ -108,6 +111,56 @@ namespace controller
         {
             resp->set_status_code("400");
             resp->String("Invalid JSON body");
+            return;
+        }
+    }
+
+    // 获取当前用户信息
+    void UserController::getUserHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw)
+    {
+        // 解析获取token
+        std::string auth_header = req->header("Authorization");
+        std::string token = "";
+        json resp_json;
+
+        if (auth_header.length() > 7 && auth_header.substr(0, 7) == "Bearer ") {
+            token = auth_header.substr(7); // 截掉前面的 "Bearer "，剩下的就是纯 Token
+            std::cout << "token: " << token << std::endl;
+        }
+        if (token.empty()) {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "未授权，请提供有效的 Token";
+            resp->Json(resp_json.dump());
+            return;
+        }
+        utils::JWT jwt = utils::JWT("secret");
+        int user_id = 0;
+        int role = 0;
+        if(jwt.verifyJWT(token,user_id,role)){
+            resp_json["status"] = "success";
+            resp_json["message"] = "获取用户信息成功";
+            resp_json["data"]["userId"] = user_id;
+            WFMySQLTask *task = userService_.get_user_info(user_id,[user_id,resp_json,resp,sw](bool ok, std::string msg, models::SysUser user) mutable
+            {
+                if(ok){
+                    resp_json["data"]["userId"] = user.id;
+                    resp_json["data"]["createTime"] = user.create_time;
+                    resp->Json(resp_json.dump());
+                }
+                else{
+                    resp_json["status"] = "error";
+                    resp_json["message"] = msg;
+                    resp->Json(resp_json.dump());
+                }
+            });
+            sw->push_back(task);
+        }else
+        {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "无效的 Token";
+            resp->Json(resp_json.dump());
             return;
         }
     }
