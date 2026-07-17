@@ -42,7 +42,6 @@ namespace services
         int ret = utils::AlibabaOss::getInstance().putObject(oss_path, stream_content);
         if(ret != 0){
             on_complete(false,"upload to oss fail");
-            return WFTaskFactory::create_empty_task();
         }
         // 写入文件
         WFFileIOTask *task = WFTaskFactory::create_pwrite_task(fd, shared_content->c_str(), file_size, offset, [shared_content,file,this,fd,on_complete](WFFileIOTask *task) 
@@ -63,15 +62,15 @@ namespace services
     }
     SubTask *TlbFileService::list_all(int uid,std::function<void(bool ok,std::string msg,std::vector<models::TlbFile> files)> on_complete){
         SubTask *task = tlbFileDao_.select_all(uid,[on_complete](bool ok,std::string msg,std::vector<models::TlbFile> files){
-            on_complete(true,msg,files);
+            on_complete(ok,msg,files);
         });
         return task;
     }
-    SubTask *TlbFileService::download(int file_id,std::function<void(bool ok,std::string msg,std::string content)> on_complete){
+    SubTask *TlbFileService::download(int file_id,std::function<void(bool ok,std::string msg,std::shared_ptr<std::string> content)> on_complete){
         auto wrap_task = std::make_shared<SubTask *>(nullptr);
         SubTask *task = tlbFileDao_.select_by_id(file_id,[wrap_task,on_complete](bool ok,std::string msg,models::TlbFile file){
             if(!ok){
-                on_complete(false,msg,"");
+                on_complete(false,msg,nullptr);
                 return;
             }
 
@@ -80,7 +79,7 @@ namespace services
 
             // 检查文件是否存在
             if(!std::filesystem::exists(physical_path)){
-                on_complete(false,"文件不存在","");
+                on_complete(false,"文件不存在",nullptr);
                 return;
             }
             
@@ -90,7 +89,7 @@ namespace services
             std::cout << fd << std::endl;
             if (fd < 0)
             {
-                on_complete(false, "无法打开文件","");
+                on_complete(false, "无法打开文件",nullptr);
                 return;
             } 
             auto buf = std::make_shared<std::string>(MAX_MEMORY_SIZE,'\0');
@@ -98,17 +97,17 @@ namespace services
             WFFileIOTask *task = WFTaskFactory::create_pread_task(fd,buf->data(),file.size,0,[fd,buf,on_complete](WFFileIOTask *task){
                 close(fd);
                 if(task->get_state() != WFT_STATE_SUCCESS){
-                    on_complete(false,"network error","");
+                    on_complete(false,"network error",nullptr);
                     return;
                 }
 
                 if(task->get_retval() < 0){
-                    on_complete(false,"read error","");
+                    on_complete(false,"read error",nullptr);
                     return;
                 }else
                 {
                     buf->resize(task->get_retval());
-                    on_complete(true,"下载成功",*buf);
+                    on_complete(true,"下载成功",buf);
                 }
             });
             series_of(*wrap_task)->push_back(task);

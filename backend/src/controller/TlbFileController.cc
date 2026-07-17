@@ -51,16 +51,12 @@ namespace controller
             sw->set_context(file_ctx);
             std::string base_url = "/home/coisini/wangdao/code/cloud-disk/backend/upload/";
             const wfrest::Form &form = req->form();
-            json resp_json;
             for (auto &it: form)
             {
                 auto &name = it.first;
                 auto &file_info = it.second;
-                std::cout << name << std::endl;
-                std::cout << file_info.second << std::endl;
                 std::string filename = file_info.first;
                 std::string physical_path = base_url + filename;
-                std::cout << physical_path << std::endl;
                 SubTask *task = tlbFileService_.upload(uid,physical_path,file_info.second,0,[resp,sw,filename,resp_json](bool ok,std::string msg)mutable {
                     if(ok){
                         // 获取上下文
@@ -71,7 +67,7 @@ namespace controller
                         resp_json["data"]["filename"] = filename;
                         resp->Json(resp_json.dump());
                     }else{
-                        resp->set_status_code("401");
+                        resp->set_status_code("500");
                         resp_json["status"] = "error";
                         resp_json["message"] = msg;
                         resp->Json(resp_json.dump());
@@ -122,11 +118,11 @@ namespace controller
                 file_id = std::stoi(file_id_str);
             }
             // 下载文件
-            SubTask *task = tlbFileService_.download(file_id,[resp,sw,resp_json,file_ctx](bool ok,std::string msg, std::string content)mutable {
+            SubTask *task = tlbFileService_.download(file_id,[resp,sw,resp_json,file_ctx](bool ok,std::string msg, std::shared_ptr<std::string> content)mutable {
                 if(ok){
                     // 设置响应头
                     resp->add_header_pair("Content-Disposition", "attachment; filename=" + file_ctx->filename);
-                    resp->String(content);
+                    resp->String(*content);
                 }else{
                     resp->set_status_code("400");
                     resp_json["status"] = "error";
@@ -177,7 +173,7 @@ namespace controller
                     resp_json["data"]["files"] = files;
                     resp->Json(resp_json.dump());
                 }else{
-                    resp->set_status_code("401");
+                    resp->set_status_code("500");
                     resp_json["status"] = "error";
                     resp_json["message"] = msg;
                     resp->Json(resp_json.dump());
