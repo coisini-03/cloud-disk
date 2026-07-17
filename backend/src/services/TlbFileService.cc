@@ -29,7 +29,9 @@ namespace services
         models::TlbFile file;
         auto shared_content = std::make_shared<std::string>(content);
         size_t file_size = shared_content->size();
+        std::cout << file_size << std::endl;
         file.uid = uid;
+        file.size = file_size;
         file.hashcode = utils::Hash::generate_hashcode(reinterpret_cast<const unsigned char *>(shared_content->c_str()),file_size);
         file.filename = std::filesystem::path(physical_path).filename().string();
       

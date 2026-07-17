@@ -18,7 +18,7 @@ namespace dao{
             utils::PreSql::escape_sql(file.filename),
             utils::PreSql::escape_sql(file.hashcode),
             std::to_string(file.size));
-
+            
         WFMySQLTask *task = WFTaskFactory::create_mysql_task(url_path_, 3,[on_complete](WFMySQLTask *task){
             // 检查网络是否成功
             if(task->get_state() != WFT_STATE_SUCCESS){
