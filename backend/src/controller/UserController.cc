@@ -115,6 +115,7 @@ namespace controller
         }
     }
 
+
     // 获取当前用户信息
     void UserController::getUserHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw)
     {

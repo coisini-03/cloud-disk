@@ -11,6 +11,7 @@ namespace dao{
         ~TlbFileDao();
         WFMySQLTask* insert(const models::TlbFile& file,std::function<void(bool ok, std::string msg)> on_complete);
         WFMySQLTask* select_all(int uid,std::function<void(bool ok, std::string msg,std::vector<models::TlbFile> files)> on_complete);
+        WFMySQLTask* select_by_id(int file_id,std::function<void(bool ok, std::string msg,models::TlbFile file)> on_complete);
     private:
         std::string url_path_;
     };

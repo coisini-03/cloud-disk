@@ -10,6 +10,7 @@
 
 namespace services
 {
+    const size_t MAX_MEMORY_SIZE = 50 * 1024 * 1024;
     TlbFileService::TlbFileService(dao::TlbFileDao &tlbFileDao)
         : tlbFileDao_(tlbFileDao)
     {
@@ -53,6 +54,55 @@ namespace services
         SubTask *task = tlbFileDao_.select_all(uid,[on_complete](bool ok,std::string msg,std::vector<models::TlbFile> files){
             on_complete(true,msg,files);
         });
+        return task;
+    }
+    SubTask *TlbFileService::download(int file_id,std::function<void(bool ok,std::string msg,std::string content)> on_complete){
+        auto wrap_task = std::make_shared<SubTask *>(nullptr);
+        SubTask *task = tlbFileDao_.select_by_id(file_id,[wrap_task,on_complete](bool ok,std::string msg,models::TlbFile file){
+            if(!ok){
+                on_complete(false,msg,"");
+                return;
+            }
+
+            std::string base_url = "/home/coisini/wangdao/code/cloud-disk/backend/upload/";
+            std::string physical_path = base_url + file.filename;
+
+            // 检查文件是否存在
+            if(!std::filesystem::exists(physical_path)){
+                on_complete(false,"文件不存在","");
+                return;
+            }
+            
+            std::cout << physical_path << std::endl;
+            // 打开文件
+            int fd = open(physical_path.c_str(), O_RDONLY);
+            std::cout << fd << std::endl;
+            if (fd < 0)
+            {
+                on_complete(false, "无法打开文件","");
+                return;
+            } 
+            auto buf = std::make_shared<std::string>(MAX_MEMORY_SIZE,'\0');
+            // 读取文件
+            WFFileIOTask *task = WFTaskFactory::create_pread_task(fd,buf->data(),file.size,0,[fd,buf,on_complete](WFFileIOTask *task){
+                close(fd);
+                if(task->get_state() != WFT_STATE_SUCCESS){
+                    on_complete(false,"network error","");
+                    return;
+                }
+
+                if(task->get_retval() < 0){
+                    on_complete(false,"read error","");
+                    return;
+                }else
+                {
+                    buf->resize(task->get_retval());
+                    on_complete(true,"下载成功",*buf);
+                }
+            });
+            series_of(*wrap_task)->push_back(task);
+        });
+        *wrap_task = task;
         return task;
     }
 }

@@ -40,5 +40,6 @@ namespace models
     struct TlbFileContext
     {
         int id;
+        std::string filename;
     };
 } // namespace models
