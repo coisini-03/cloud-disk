@@ -15,7 +15,7 @@ namespace services
     {
         std::string accessToken;
         
-        WFMySQLTask *task = userDao_.select_by_username(user_name,[accessToken,on_complete,password](bool ok,std::string msg,models::SysUser &user) mutable
+        WFMySQLTask *task = userDao_.select_by_username(user_name,[accessToken,on_complete,password](bool ok,std::string msg,models::SysUser user) mutable
         {
             if(ok){
                 if(utils::Hash::verify_password(password,user.password_hash)){

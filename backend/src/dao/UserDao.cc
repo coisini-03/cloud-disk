@@ -52,7 +52,7 @@ namespace dao
         return task;
     }
     // 根据用户名查询用户信息
-    WFMySQLTask* UserDao::select_by_username(const std::string& username,std::function<void(bool ok, std::string msg, models::SysUser &user)> on_complete)
+    WFMySQLTask* UserDao::select_by_username(const std::string& username,std::function<void(bool ok, std::string msg, models::SysUser user)> on_complete)
     {
         std::string user_name = utils::PreSql::escape_sql(username);
         std::string sql = fmt::format(

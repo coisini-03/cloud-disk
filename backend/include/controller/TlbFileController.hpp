@@ -10,6 +10,7 @@ namespace controller
     private:
         services::TlbFileService &tlbFileService_;
         void uploadHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw);
+        void listAllHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw);
     public:
         TlbFileController(services::TlbFileService &tlbFileService);
         ~TlbFileController();

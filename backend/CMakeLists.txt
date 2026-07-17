@@ -37,6 +37,7 @@ find_package(spdlog REQUIRED)
 find_package(wfrest REQUIRED)
 add_library(clouddisk_common INTERFACE)
 
+
 link_directories(/usr/local/lib)
 target_include_directories(clouddisk_common INTERFACE
     ${CMAKE_SOURCE_DIR}/include
@@ -50,6 +51,10 @@ target_link_libraries(clouddisk_common INTERFACE
     sodium
     spdlog
     wfrest
+    alibabacloud-oss-cpp-sdk
+    curl
+    crypto
+    pthread
 )
 
 add_subdirectory(src)

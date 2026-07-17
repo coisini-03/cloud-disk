@@ -15,7 +15,8 @@ namespace controller
     // 注册路由
     void TlbFileController::registerRoutes(wfrest::BluePrint &bp)
     {
-        bp.POST("/upload",std::bind(&TlbFileController::uploadHandler,this,_1,_2,_3));
+        bp.POST("/files",std::bind(&TlbFileController::uploadHandler,this,_1,_2,_3));
+        bp.GET("/files",std::bind(&TlbFileController::listAllHandler,this,_1,_2,_3));
     }
     // 析构
     TlbFileController::~TlbFileController()=default;
@@ -43,7 +44,9 @@ namespace controller
         int role = 0;
 
         if(jwt.verifyJWT(token,uid,role)){  
-            
+            // 设置上下文
+            models::TlbFileContext *file_ctx = new models::TlbFileContext();
+            sw->set_context(file_ctx);
             std::string base_url = "/home/coisini/wangdao/code/cloud-disk/backend/upload/";
             const wfrest::Form &form = req->form();
             json resp_json;
@@ -85,5 +88,51 @@ namespace controller
         }
     }
     
-
+    // 列出所有文件
+    void TlbFileController::listAllHandler(const wfrest::HttpReq *req, wfrest::HttpResp *resp,SeriesWork *sw)
+    {
+        // 解析获取token
+        std::string content_type = req->header("Content-Type");
+        std::cout << content_type << std::endl;
+        std::string auth_header = req->header("Authorization");
+        std::string token = "";
+        json resp_json;
+        if (auth_header.length() > 7 && auth_header.substr(0, 7) == "Bearer ") {
+            token = auth_header.substr(7); // 截掉前面的 "Bearer "，剩下的就是纯 Token
+        }
+        if (token.empty()) {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "未授权，请提供有效的 Token";
+            resp->Json(resp_json.dump());
+            return;
+        }
+        utils::JWT jwt = utils::JWT("secret");
+        int uid = 0;
+        int role = 0;
+        if(jwt.verifyJWT(token,uid,role)){
+            // 列出所有文件
+            SubTask *task = tlbFileService_.list_all(uid,[resp,sw,resp_json](bool ok,std::string msg, std::vector<models::TlbFile> files)mutable {
+                if(ok){
+                    resp_json["status"] = "success";
+                    resp_json["message"] = "获取文件列表成功";
+                    resp_json["data"]["files"] = files;
+                    resp->Json(resp_json.dump());
+                }else{
+                    resp->set_status_code("401");
+                    resp_json["status"] = "error";
+                    resp_json["message"] = msg;
+                    resp->Json(resp_json.dump());
+                }
+            });
+            sw->push_back(task);
+        }else
+        {
+            resp->set_status_code("401"); // 401 Unauthorized
+            resp_json["status"] = "error";
+            resp_json["message"] = "无效的 Token";
+            resp->Json(resp_json.dump());
+            return;
+        }
+    }
 }

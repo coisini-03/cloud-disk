@@ -7,9 +7,11 @@ add_executable(test_config test_config.cc)
 add_executable(test_user test_user.cc)
 add_executable(test_userservice test_userservice.cc)
 add_executable(test_tlbfiledao test_tlbfiledao.cc)
+add_executable(test_oss test_oss.cc)
+add_executable(test_tlbfileservice test_tlbfileservice.cc)
 
 
-target_include_directories(test_jwt PRIVATE ${CMAKE_SOURCE_DIR}/include)
+target_compile_options(test_oss PRIVATE -fno-rtti)
 # 链接 GTest 库以及可能需要的线程库和加密库（如 OpenSSL）
 target_link_libraries(test_jwt
     clouddisk_utils
@@ -44,4 +46,15 @@ target_link_libraries(test_tlbfiledao
     clouddisk_common
     clouddisk_dao
 )
+target_link_libraries(test_oss
+    clouddisk_common
+)
+target_link_libraries(test_tlbfileservice
+    clouddisk_utils
+    clouddisk_common
+    clouddisk_dao
+    clouddisk_services
+)
+
+
         

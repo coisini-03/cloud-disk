@@ -9,7 +9,7 @@ namespace services
         TlbFileService(dao::TlbFileDao &tlbFileDao);
         ~TlbFileService();
         SubTask *upload(int uid, std::string physical_path, std::string content, off_t offset, std::function<void(bool ok, std::string msg)> done);
-
+        SubTask *list_all(int uid,std::function<void(bool ok,std::string msg,std::vector<models::TlbFile> files)> on_complete);
     private:
         dao::TlbFileDao &tlbFileDao_;
     };

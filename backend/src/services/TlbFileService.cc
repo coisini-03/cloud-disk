@@ -49,4 +49,10 @@ namespace services
         });
         return task;
     }
+    SubTask *TlbFileService::list_all(int uid,std::function<void(bool ok,std::string msg,std::vector<models::TlbFile> files)> on_complete){
+        SubTask *task = tlbFileDao_.select_all(uid,[on_complete](bool ok,std::string msg,std::vector<models::TlbFile> files){
+            on_complete(true,msg,files);
+        });
+        return task;
+    }
 }
