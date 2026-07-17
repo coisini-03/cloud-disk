@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <filesystem>
 #include <memory>
+#include <utils/AlibabaOss.hpp>
 
 namespace services
 {
@@ -34,7 +35,15 @@ namespace services
         file.size = file_size;
         file.hashcode = utils::Hash::generate_hashcode(reinterpret_cast<const unsigned char *>(shared_content->c_str()),file_size);
         file.filename = std::filesystem::path(physical_path).filename().string();
-      
+        // 容灾路径
+        std::string oss_path= std::to_string(uid) + "/"+file.filename;
+        // 上传文件到OSS
+        auto stream_content = std::make_shared<std::stringstream>(*shared_content);
+        int ret = utils::AlibabaOss::getInstance().putObject(oss_path, stream_content);
+        if(ret != 0){
+            on_complete(false,"upload to oss fail");
+            return WFTaskFactory::create_empty_task();
+        }
         // 写入文件
         WFFileIOTask *task = WFTaskFactory::create_pwrite_task(fd, shared_content->c_str(), file_size, offset, [shared_content,file,this,fd,on_complete](WFFileIOTask *task) 
         {

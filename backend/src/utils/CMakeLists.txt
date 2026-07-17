@@ -4,6 +4,7 @@ set(UTILS_SRC
 	Logger.cc
 	Config.cc
 	PreSql.cc
+	AlibabaOss.cc
 )
 
 add_library(clouddisk_utils STATIC ${UTILS_SRC})

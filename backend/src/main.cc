@@ -8,6 +8,8 @@
 #include <wfrest/HttpServer.h>
 #include <workflow/WFFacilities.h>
 #include <csignal>
+#include <utils/Config.hpp>
+#include <utils/AlibabaOss.hpp>
 
 using namespace std;
 WFFacilities::WaitGroup waitGroup(1);
@@ -20,9 +22,23 @@ int main(int argc,char *arg[]){
         waitGroup.done();
     });
 
+    // 初始化配置
+    utils::Config config("conf/app.json");
+
+        // 初始化OSS配置
+    utils::OssConfig oss_cfg;
+    oss_cfg.endpoint = config.get<std::string>("oss.endpoint");
+    oss_cfg.region = config.get<std::string>("oss.region");
+    oss_cfg.bucketname = config.get<std::string>("oss.bucketName");
+    oss_cfg.access_key_id = config.get<std::string>("oss.accessKeyId");
+    oss_cfg.access_key_secret = config.get<std::string>("oss.accessKeySecret");
+    // 初始化OSS客户端
+    utils::AlibabaOss::getInstance().init(oss_cfg);
+    
+
     wfrest::BluePrint auth_bp;
     wfrest::BluePrint file_bp;
-    std::string db_url = "mysql://root:123456@localhost:3306/clouddisk";
+    std::string db_url = config.mysql_url();
 
     dao::UserDao userDao(db_url);
     services::UserService userService(userDao);
@@ -44,8 +60,9 @@ int main(int argc,char *arg[]){
     tlbFileController.registerRoutes(file_bp);
     server.register_blueprint(file_bp,"/api/v1");
     // 启动服务器
-    if(server.start(8080) == 0){
-        std::cout << "Server started on port 8080" << std::endl;
+    int port = config.get<int>("server.port");
+    if(server.start(port) == 0){
+        std::cout << "Server started on port " << port << std::endl;
         waitGroup.wait();
         server.stop();
     }else{

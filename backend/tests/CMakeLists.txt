@@ -48,6 +48,7 @@ target_link_libraries(test_tlbfiledao
 )
 target_link_libraries(test_oss
     clouddisk_common
+    clouddisk_utils
 )
 target_link_libraries(test_tlbfileservice
     clouddisk_utils
