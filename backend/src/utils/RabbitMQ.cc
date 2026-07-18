@@ -11,7 +11,7 @@ namespace utils{
         return "amqp://" + user + ":" + password + "@" + host + ":" + std::to_string(port) + "/" + vhost;
     }
 
-    RabbitMQ& RabbitMQ::GetInstance()
+    RabbitMQ& RabbitMQ::getInstance()
     {
         static RabbitMQ instance;
         return instance;
@@ -21,6 +21,7 @@ namespace utils{
         config_ = config;
         try{
             channel_ = Channel::CreateFromUri(config_.get_uri());
+            channel_->DeclareQueue(config_.queue_name, false, true, false, false);
             LOG_INFO("RabbitMQ init success");
             
         }catch(const std::exception &e){

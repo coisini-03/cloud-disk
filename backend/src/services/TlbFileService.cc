@@ -8,6 +8,10 @@
 #include <filesystem>
 #include <memory>
 #include <utils/AlibabaOss.hpp>
+#include <utils/Logger.hpp>
+#include <nlohmann/json.hpp>
+#include <utils/RabbitMQ.hpp>
+
 
 namespace services
 {
@@ -35,25 +39,32 @@ namespace services
         file.size = file_size;
         file.hashcode = utils::Hash::generate_hashcode(reinterpret_cast<const unsigned char *>(shared_content->c_str()),file_size);
         file.filename = std::filesystem::path(physical_path).filename().string();
-        // 容灾路径
-        std::string oss_path= std::to_string(uid) + "/"+file.filename;
-        // 上传文件到OSS
-        auto stream_content = std::make_shared<std::stringstream>(*shared_content);
-        int ret = utils::AlibabaOss::getInstance().putObject(oss_path, stream_content);
-        if(ret != 0){
-            on_complete(false,"upload to oss fail");
-        }
+
         // 写入文件
-        WFFileIOTask *task = WFTaskFactory::create_pwrite_task(fd, shared_content->c_str(), file_size, offset, [shared_content,file,this,fd,on_complete](WFFileIOTask *task) 
+        WFFileIOTask *task = WFTaskFactory::create_pwrite_task(fd, shared_content->c_str(), file_size, offset, [physical_path,shared_content,file,this,fd,on_complete](WFFileIOTask *task) 
         {
             // 关闭文件
             close(fd);
             // 调用回调函数
             if(task->get_state() != WFT_STATE_SUCCESS){
+                LOG_WARN("write file to disk fail network error");
                 on_complete(false,"network error");
                 return;
             }
+            LOG_INFO("write file to disk success");
+            // 容灾备份
+            nlohmann::json json;
+            json["uid"] = file.uid;
+            json["filename"] = file.filename;
+            json["physical_path"] = physical_path;
+            utils::RabbitMQ::getInstance().publish(json.dump());
+
             WFMySQLTask *mysql_task = tlbFileDao_.insert(file,[on_complete](bool ok,std::string msg){
+                if(!ok){
+                    LOG_ERROR("insert file to db fail");
+                }else{
+                    LOG_INFO("insert file to db success");
+                }
                 on_complete(ok,msg);
             });
             series_of(task)->push_back(mysql_task);

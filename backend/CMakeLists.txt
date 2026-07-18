@@ -60,7 +60,6 @@ target_link_libraries(clouddisk_common INTERFACE
 )
 
 add_subdirectory(src)
-add_subdirectory(rabbitmq)
 add_subdirectory(tests)
 
 

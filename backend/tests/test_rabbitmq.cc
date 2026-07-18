@@ -7,7 +7,7 @@ using namespace std;
 
 void test_publish()
 {
-    utils::RabbitMQ::GetInstance().publish("hellow world");
+    utils::RabbitMQ::getInstance().publish("hellow world");
 }
 
 int main(int argc, char const *argv[])
@@ -27,7 +27,7 @@ int main(int argc, char const *argv[])
     mq_config.exchange = config.get<string>("rabbitmq.exchange");
     mq_config.routing_key = config.get<string>("rabbitmq.routing_key");
     mq_config.vhost = config.get<string>("rabbitmq.vhost");
-    utils::RabbitMQ::GetInstance().init(mq_config);
+    utils::RabbitMQ::getInstance().init(mq_config);
 
     test_publish();
     return 0;

@@ -28,7 +28,7 @@ namespace utils
         Channel::ptr_t channel_;
         std::mutex mutex_;
     public:
-        static RabbitMQ& GetInstance();
+        static RabbitMQ& getInstance();
         bool init(const RabbitMQConfig &config);
         bool publish(const std::string &message);
         RabbitMQ(const RabbitMQ &rhs)=delete;
