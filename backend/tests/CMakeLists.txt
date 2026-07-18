@@ -9,6 +9,8 @@ add_executable(test_userservice test_userservice.cc)
 add_executable(test_tlbfiledao test_tlbfiledao.cc)
 add_executable(test_oss test_oss.cc)
 add_executable(test_tlbfileservice test_tlbfileservice.cc)
+add_executable(test_rabbitmq test_rabbitmq.cc)
+
 
 
 target_compile_options(test_oss PRIVATE -fno-rtti)
@@ -55,6 +57,10 @@ target_link_libraries(test_tlbfileservice
     clouddisk_common
     clouddisk_dao
     clouddisk_services
+)
+target_link_libraries(test_rabbitmq
+    clouddisk_utils
+    clouddisk_common
 )
 
 

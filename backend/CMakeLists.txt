@@ -35,6 +35,7 @@ find_package(nlohmann_json REQUIRED)
 find_package(jwt-cpp REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(wfrest REQUIRED)
+
 add_library(clouddisk_common INTERFACE)
 
 
@@ -55,10 +56,13 @@ target_link_libraries(clouddisk_common INTERFACE
     curl
     crypto
     pthread
+    SimpleAmqpClient
 )
 
 add_subdirectory(src)
+add_subdirectory(rabbitmq)
 add_subdirectory(tests)
+
 
 file(COPY ${CMAKE_SOURCE_DIR}/conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
 file(COPY ${CMAKE_SOURCE_DIR}/../frontend DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

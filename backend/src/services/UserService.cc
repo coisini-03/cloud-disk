@@ -20,7 +20,7 @@ namespace services
             if(ok){
                 if(utils::Hash::verify_password(password,user.password_hash)){
                     utils::JWT jwt = utils::JWT("secret");
-                    accessToken = jwt.generateJWT(user.id,user.role,60*5);
+                    accessToken = jwt.generateJWT(user.id,user.role,60*30);
                     on_complete(true,"登录成功",accessToken);
                 }
                 else{

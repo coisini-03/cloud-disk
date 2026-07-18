@@ -5,6 +5,7 @@ set(UTILS_SRC
 	Config.cc
 	PreSql.cc
 	AlibabaOss.cc
+	RabbitMQ.cc
 )
 
 add_library(clouddisk_utils STATIC ${UTILS_SRC})
