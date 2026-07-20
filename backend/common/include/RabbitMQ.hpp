@@ -33,5 +33,6 @@ namespace utils
         bool publish(const std::string &message);
         RabbitMQ(const RabbitMQ &rhs)=delete;
         RabbitMQ& operator=(const RabbitMQ &rhs)=delete;
+
     };
 }

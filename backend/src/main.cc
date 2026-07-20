@@ -12,7 +12,6 @@
 #include "AlibabaOss.hpp"
 #include "Logger.hpp"
 #include "RabbitMQ.hpp"
-#include <services/OssBackupWorker.hpp>
 
 using namespace std;
 WFFacilities::WaitGroup waitGroup(1);
@@ -46,6 +45,7 @@ int main(int argc,char *arg[]){
     // 初始化OSS客户端
     utils::AlibabaOss::getInstance().init(oss_cfg);
     LOG_INFO("初始化OSS客户端");
+
     // 初始化rabbitmq配置
     utils::RabbitMQConfig rabbitmq_cfg;
     rabbitmq_cfg.host = config.get<std::string>("rabbitmq.host");
@@ -58,12 +58,8 @@ int main(int argc,char *arg[]){
     rabbitmq_cfg.vhost = config.get<std::string>("rabbitmq.vhost");
     // 初始化rabbitmq客户端
     utils::RabbitMQ::getInstance().init(rabbitmq_cfg);
-    LOG_INFO("初始化rabbitmq客户端");
+    LOG_INFO("初始化rabbitmq生产者成功");
 
-    // 拉起消费者线程
-    std::thread consumer_thread(services::oss_consumer_loop,rabbitmq_cfg);
-    consumer_thread.detach();
-    LOG_INFO("启动rabbitmq消费者线程");
 
     wfrest::BluePrint auth_bp;
     wfrest::BluePrint file_bp;

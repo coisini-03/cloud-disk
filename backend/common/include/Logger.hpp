@@ -1,4 +1,6 @@
 #pragma once
+
+#define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #include <spdlog/spdlog.h>
 #include <memory>
 #include <string>
@@ -19,8 +21,7 @@ private:
 
 } // namespace utils
 
-// 便捷宏定义：不同级别的日志输出
-#define LOG_DEBUG(...) utils::Logger::get()->debug(__VA_ARGS__) // 调试日志
-#define LOG_INFO(...)  utils::Logger::get()->info(__VA_ARGS__)  // 普通信息日志
-#define LOG_WARN(...)  utils::Logger::get()->warn(__VA_ARGS__)  // 警告日志
-#define LOG_ERROR(...) utils::Logger::get()->error(__VA_ARGS__) // 错误日志
+#define LOG_DEBUG(...) SPDLOG_LOGGER_DEBUG(utils::Logger::get(), __VA_ARGS__) // 调试日志
+#define LOG_INFO(...)  SPDLOG_LOGGER_INFO(utils::Logger::get(), __VA_ARGS__)  // 普通信息日志
+#define LOG_WARN(...)  SPDLOG_LOGGER_WARN(utils::Logger::get(), __VA_ARGS__)  // 警告日志
+#define LOG_ERROR(...) SPDLOG_LOGGER_ERROR(utils::Logger::get(), __VA_ARGS__) // 错误日志

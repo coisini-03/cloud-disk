@@ -26,8 +26,8 @@ void Logger::init(const std::string& path, const std::string& level, int hour, i
     instance_->set_level(spdlog::level::from_str(level));
     // 设置遇到 info 及以上级别时自动 flush 到文件
     instance_->flush_on(spdlog::level::info);
-    // 设置日志输出格式：[时间] [级别] 消息内容
-    instance_->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%l] %v");
+    // 设置日志输出格式：[时间] [级别] [文件名:行号] 消息内容
+    instance_->set_pattern("[%Y-%m-%d %H:%M:%S.%e] [%^%l%$] [%s:%#] %v");
 }
 
 // 获取日志实例（单例），若未初始化则返回空指针

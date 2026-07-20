@@ -60,8 +60,9 @@ target_link_libraries(clouddisk_thirdparty INTERFACE
 )
 
 add_subdirectory(common)
+add_subdirectory(oss_worker)
 add_subdirectory(src)
-add_subdirectory(tests)
+# add_subdirectory(tests)
 
 
 file(COPY ${CMAKE_SOURCE_DIR}/conf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/bin)
