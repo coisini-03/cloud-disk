@@ -3,9 +3,9 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
-#include <utils/AlibabaOss.hpp> 
-#include <utils/RabbitMQ.hpp>  
-#include <utils/Logger.hpp> 
+#include "AlibabaOss.hpp" 
+#include "RabbitMQ.hpp"  
+#include "Logger.hpp" 
 
 namespace services {
 void oss_consumer_loop(utils::RabbitMQConfig config) {

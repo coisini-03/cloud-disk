@@ -4,7 +4,7 @@
 #include <workflow/Workflow.h>
 #include <services/UserService.hpp>
 #include <nlohmann/json.hpp>
-#include <utils/JWT.hpp>
+#include "JWT.hpp"
 
 using json = nlohmann::json;
 using namespace std::placeholders;

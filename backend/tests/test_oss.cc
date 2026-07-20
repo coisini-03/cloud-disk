@@ -1,6 +1,6 @@
 #include <alibabacloud/oss/OssClient.h>
-#include <utils/AlibabaOss.hpp>
-#include <utils/Config.hpp>
+#include "AlibabaOss.hpp"
+#include "Config.hpp"
 
 using namespace AlibabaCloud::OSS;
 

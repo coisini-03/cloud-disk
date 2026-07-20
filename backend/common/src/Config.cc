@@ -1,4 +1,4 @@
-#include <utils/Config.hpp>
+#include "Config.hpp"
 #include <fstream>
 #include <sstream>
 #include <stdexcept>

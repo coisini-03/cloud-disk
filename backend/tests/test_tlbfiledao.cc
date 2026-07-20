@@ -1,7 +1,7 @@
 #include <iostream>
 #include <dao/TlbFileDao.hpp>
-#include <models/TlbFile.hpp>
-#include <utils/Hash.hpp>
+#include "TlbFile.hpp"
+#include "Hash.hpp"
 using namespace std;
 
 int main(int argc,char *arg[]){

@@ -1,8 +1,8 @@
 
 #include <services/UserService.hpp>
-#include <utils/Hash.hpp>
-#include <utils/JWT.hpp>
-#include <models/SysUser.hpp>
+#include "Hash.hpp"
+#include "JWT.hpp"
+#include "SysUser.hpp"
 #include <string>
 namespace services
 {

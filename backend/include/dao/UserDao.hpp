@@ -1,5 +1,5 @@
 #pragma once
-#include <models/SysUser.hpp>
+#include "SysUser.hpp"
 #include <workflow/WFTaskFactory.h>
 #include <functional>
 

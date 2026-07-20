@@ -2,7 +2,7 @@
 #include <string>
 #include <stdexcept>
 // 替换为你的实际 Hash 头文件路径，例如 "Hash.hpp"
-#include "utils/Hash.hpp" 
+#include "Hash.hpp" 
 
 using namespace std;
 void runManualHashTests() {

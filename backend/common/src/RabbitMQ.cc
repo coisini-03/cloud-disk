@@ -1,5 +1,5 @@
-#include <utils/RabbitMQ.hpp>
-#include <utils/Logger.hpp>
+#include "RabbitMQ.hpp"
+#include "Logger.hpp"
 
 namespace utils{
     std::string RabbitMQConfig::get_uri()

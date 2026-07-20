@@ -1,6 +1,6 @@
 #include <iostream>
 #include "dao/UserDao.hpp"
-#include <utils/Hash.hpp>
+#include "Hash.hpp"
 
 using namespace std;
 using namespace dao;

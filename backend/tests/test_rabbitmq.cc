@@ -1,6 +1,6 @@
-#include <utils/RabbitMQ.hpp>
-#include <utils/Logger.hpp>
-#include <utils/Config.hpp>
+#include "RabbitMQ.hpp"
+#include "Logger.hpp"
+#include "Config.hpp"
 #include <string>
 
 using namespace std;

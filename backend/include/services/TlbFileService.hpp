@@ -1,6 +1,6 @@
 #pragma once
 #include <dao/TlbFileDao.hpp>
-#include <models/TlbFile.hpp>
+#include "TlbFile.hpp"
 namespace services
 {
     class TlbFileService

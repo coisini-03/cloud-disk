@@ -36,15 +36,15 @@ find_package(jwt-cpp REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(wfrest REQUIRED)
 
-add_library(clouddisk_common INTERFACE)
+add_library(clouddisk_thirdparty INTERFACE)
 
 
 link_directories(/usr/local/lib)
-target_include_directories(clouddisk_common INTERFACE
+target_include_directories(clouddisk_thirdparty INTERFACE
     ${CMAKE_SOURCE_DIR}/include
 )
 
-target_link_libraries(clouddisk_common INTERFACE
+target_link_libraries(clouddisk_thirdparty INTERFACE
     workflow
     fmt
     jwt-cpp::jwt-cpp
@@ -59,6 +59,7 @@ target_link_libraries(clouddisk_common INTERFACE
     SimpleAmqpClient
 )
 
+add_subdirectory(common)
 add_subdirectory(src)
 add_subdirectory(tests)
 

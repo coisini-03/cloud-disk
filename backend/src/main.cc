@@ -8,10 +8,10 @@
 #include <wfrest/HttpServer.h>
 #include <workflow/WFFacilities.h>
 #include <csignal>
-#include <utils/Config.hpp>
-#include <utils/AlibabaOss.hpp>
-#include <utils/Logger.hpp>
-#include <utils/RabbitMQ.hpp>
+#include "Config.hpp"
+#include "AlibabaOss.hpp"
+#include "Logger.hpp"
+#include "RabbitMQ.hpp"
 #include <services/OssBackupWorker.hpp>
 
 using namespace std;
