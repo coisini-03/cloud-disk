@@ -1,8 +1,13 @@
-#include <dao/UserDao.hpp>
-#include "PreSql.hpp"
+
 #include <workflow/WFTaskFactory.h>
 #include <workflow/MySQLResult.h>
 #include <fmt/core.h>
+
+#include "UserDao.hpp"
+#include "PreSql.hpp"
+#include "SysUser.hpp"
+
+
 namespace dao
 {
     UserDao::UserDao(const std::string &url_path)

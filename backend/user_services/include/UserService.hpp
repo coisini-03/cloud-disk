@@ -3,7 +3,7 @@
 #include <workflow/SubTask.h>
 #include <string>
 #include <functional>
-#include "dao/UserDao.hpp"
+#include "UserDao.hpp"
 
 namespace services
 {

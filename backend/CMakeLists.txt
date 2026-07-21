@@ -35,6 +35,9 @@ find_package(nlohmann_json REQUIRED)
 find_package(jwt-cpp REQUIRED)
 find_package(spdlog REQUIRED)
 find_package(wfrest REQUIRED)
+find_package(srpc REQUIRED)
+set(Protobuf_USE_STATIC_LIBS OFF)
+find_package(Protobuf REQUIRED)
 
 add_library(clouddisk_thirdparty INTERFACE)
 
@@ -57,11 +60,17 @@ target_link_libraries(clouddisk_thirdparty INTERFACE
     crypto
     pthread
     SimpleAmqpClient
+    srpc
+    protobuf::libprotobuf
 )
 
 add_subdirectory(common)
 add_subdirectory(oss_worker)
-add_subdirectory(src)
+add_subdirectory(idl)
+add_subdirectory(file_services)
+add_subdirectory(user_services)
+add_subdirectory(api_gateway)
+
 # add_subdirectory(tests)
 
 
