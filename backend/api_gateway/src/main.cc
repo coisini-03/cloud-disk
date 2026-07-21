@@ -3,12 +3,14 @@
 #include <nlohmann/json.hpp>
 #include <workflow/WFFacilities.h>
 #include <wfrest/BluePrint.h>
+#include <workflow/UpstreamManager.h>
 #include <signal.h>
 #include "user.srpc.h"
 #include "Config.hpp"
 #include "Logger.hpp"
 #include "JWT.hpp"
 
+using json = nlohmann::json;
 WFFacilities::WaitGroup waitGroup(1);
 
 void sig_handler(int signo)
@@ -16,7 +18,53 @@ void sig_handler(int signo)
 	waitGroup.done();
 }
 
-using json = nlohmann::json;
+// 动态发现健康服务添加到集群
+void discover_user_services_from_consul() {
+    std::string consul_url = "http://192.168.83.128:8500/v1/health/service/user_services?passing=true";
+
+    WFHttpTask *task = WFTaskFactory::create_http_task(consul_url, 0, 2, [](WFHttpTask *task) {
+        if (task->get_state() != WFT_STATE_SUCCESS) {
+            LOG_ERROR("discover_user_services_from_consul failed, error: {}",task->get_error());
+            return;
+        }
+
+        protocol::HttpResponse *resp = task->get_resp();
+        std::string body;
+        const void *body_ptr;
+        size_t body_len;
+        resp->get_parsed_body(&body_ptr, &body_len);
+        
+        if (body_ptr) {
+            body.assign((const char*)body_ptr, body_len);
+            size_t start_pos = body.find_first_of("[");
+            size_t end_pos = body.find_last_of("]");
+            if(start_pos == std::string::npos || end_pos == std::string::npos){
+                LOG_ERROR("discover_user_services_from_consul failed, body is not json array");
+                return;
+            }
+            body = body.substr(start_pos, end_pos - start_pos + 1);
+            try {
+                json nodes = json::parse(body);
+                
+                // 遍历 Consul 返回的节点数组
+                for (const auto& node : nodes) {
+                    // 动态提取 IP 和 端口
+                    std::string ip = node["Service"]["Address"];
+                    int port = node["Service"]["Port"];
+                    std::string server_addr = ip + ":" + std::to_string(port);
+                    
+                    //添加到负载均衡集群中
+                    UpstreamManager::upstream_add_server("userservices", server_addr);
+                    LOG_INFO("discover_user_services_from_consul success: {}", server_addr);
+                }
+            } catch (const std::exception& e) {
+                LOG_ERROR("json parse failed: {}", e.what());
+            }
+        }
+    });
+
+    task->start();
+}
 int main(int argc, char const *argv[])
 {
     signal(SIGINT,sig_handler);
@@ -31,7 +79,10 @@ int main(int argc, char const *argv[])
     wfrest::HttpServer server;
 
     // 实例化rpc客户端
-    cloud_disk::UserService::SRPCClient user_client("127.0.0.1",8081);
+    UpstreamManager::upstream_create_weighted_random("userservices",false);
+    // 动态发现健康服务添加到集群
+    discover_user_services_from_consul();
+    cloud_disk::UserService::SRPCClient user_client("userservices", 80);
 
 
     // 注册静态资源
